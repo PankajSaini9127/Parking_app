@@ -11,8 +11,8 @@ import {
 import { useTheme } from '@react-navigation/native';
 
 const SignUp = ({ navigation }) => {
-  const [formError,setFormError] = useState()
-  
+  const [formError,setFormError] = useState("")
+
   const [data, setData] = useState({
     user: "",
     password: "",
@@ -20,17 +20,32 @@ const SignUp = ({ navigation }) => {
     email: "",
   });
 
+    //validation
+    function validate(data){
+
+      let error ;
+     
+      if(data.email === ""){
+        error = "Please Enter UserId!";
+      }else if(data.password === ""){
+        error = "Please Enter Password!";
+      }else if(data.cPassword === ""){
+        error = "Please Confirm Password!";
+      }else if(data.password !== data.cPassword){
+        error = "Password Not Match!"
+      }
+      setFormError(error)
+  
+if(error){
+  return false;
+}else{
+  return true;
+}
+    };
+
   const handleSignUp = () => {
-    console.log(
-      "Logging in with:",
-      data,
-      data.user === "Pankaj",
-      data.password === "ravi"
-    );
-    if (data.user === "Pankaj" && data.password === "ravi") {
-      console.log("data matched");
-      navigation.navigate("Home");
-    } else {
+    if(validate(data)){
+      navigation.navigate("Login")
     }
   };
 
@@ -55,7 +70,7 @@ const SignUp = ({ navigation }) => {
             style={[styles.inputText,{color:Theme.colors.primary}]}s
             placeholder="Email"
             placeholderTextColor={Theme.colors.primary}
-            onChangeText={(text) => setData({ ...data, email: text })}
+            onChangeText={(text) => {setData({ ...data, email: text });setFormError("")}}
           />
         </View>
 
@@ -66,7 +81,7 @@ const SignUp = ({ navigation }) => {
             value={data.password}
             placeholder="Password"
             placeholderTextColor={Theme.colors.primary}
-            onChangeText={(text) => setData({ ...data, password: text })}
+            onChangeText={(text) => {setData({ ...data, password: text });setFormError("")}}
           />
         </View>
 
@@ -77,7 +92,7 @@ const SignUp = ({ navigation }) => {
             style={[styles.inputText,{color:Theme.colors.primary}]}
             placeholder="Confirm Password"
             placeholderTextColor={Theme.colors.primary}
-            onChangeText={(text) => setData({ ...data, cPassword: text })}
+            onChangeText={(text) => {setData({ ...data, cPassword: text });setFormError("")}}
           />
         </View>
 

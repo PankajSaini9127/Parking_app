@@ -93,10 +93,11 @@ const List = ({navigation}) => {
   const [open,setOpen] = useState(false);
 
   function filterSearch(value){
+    
     if(value === ""){
       setData(dummyData)
     }else{
-      let newData = data.filter((item)=>item.city.includes(value)|| item.Address.includes(value))
+      let newData = data.filter((item)=>item.city.toLowerCase().includes(value.toLowerCase())|| item.Address.toLowerCase().includes(value.toLowerCase()))
       setData(newData)
     }
        

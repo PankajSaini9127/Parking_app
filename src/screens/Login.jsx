@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
     }else{
     return false;
   }
-  }
+  };
 
   const handleLogin = () => {
    //validation

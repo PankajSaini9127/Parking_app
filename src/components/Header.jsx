@@ -3,13 +3,16 @@ import { View, Text, StyleSheet, TextInput,TouchableOpacity } from "react-native
 
 import { useTheme } from "@react-navigation/native";
 
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { AntDesign } from '@expo/vector-icons'; 
+
 function Header({ value, setValue,navigation }) {
   const Theme = useTheme();
 
   return (
     <View style={[style.container, { backgroundColor: Theme.colors.primary }]}>
       <View style={style.backBtnContainer}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}><Text style={{ color:"#fff"}}>Back</Text></TouchableOpacity>
+        <TouchableOpacity onPress={()=>navigation.goBack()}><AntDesign name="arrowleft" size={30} color="#fff" style={{fontWeight:"800"}} /></TouchableOpacity>
       </View>
       <View style={style.searchWrapper}>
         <Text style={style.heading}>Search</Text>
@@ -22,7 +25,7 @@ function Header({ value, setValue,navigation }) {
             placeholderTextColor={Theme.colors.primary}
           />
           <TouchableOpacity onPress={()=>setValue("")}>
-          <Text style={{ fontSize: 15,color:Theme.colors.primary }}>Clear</Text>
+          <Text style={{ fontSize: 15,color:Theme.colors.primary }}> <AntDesign name="close" size={30} color={Theme.colors.primary} style={{fontWeight:"800"}} /></Text>
           </TouchableOpacity>
           
         </View>
