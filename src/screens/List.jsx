@@ -11,6 +11,7 @@ import Header from "../components/Header";
 
 // Modal parking details
 import CardParkingDetails from "../components/Modal";
+import Theme from "../theme/Theme";
 
 const dummyData = [
   {
@@ -78,54 +79,71 @@ const dummyData = [
   },
 ];
 
-const List = ({navigation}) => {
-
+const List = ({ navigation }) => {
   // dummy data for list
-  const [data,setData] = useState(dummyData);
+  const [data, setData] = useState(dummyData);
 
   //search feed value
-  const [searchVal,setSearchVal] = useState("");
+  const [searchVal, setSearchVal] = useState("");
 
   //selected Item
-  const [selectItem,setSelectedItem] = useState(null);
+  const [selectItem, setSelectedItem] = useState(null);
 
   //modal open togal
-  const [open,setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  function filterSearch(value){
-    
-    if(value === ""){
-      setData(dummyData)
-    }else{
-      let newData = data.filter((item)=>item.city.toLowerCase().includes(value.toLowerCase())|| item.Address.toLowerCase().includes(value.toLowerCase()))
-      setData(newData)
+  function filterSearch(value) {
+    if (value === "") {
+      setData(dummyData);
+    } else {
+      let newData = data.filter(
+        (item) =>
+          item.city.toLowerCase().includes(value.toLowerCase()) ||
+          item.Address.toLowerCase().includes(value.toLowerCase())
+      );
+      setData(newData);
     }
-       
   }
 
-  useEffect(()=>{
-    filterSearch(searchVal)
-  },[searchVal])
-
+  useEffect(() => {
+    filterSearch(searchVal);
+  }, [searchVal]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={{}} onPress={()=>{setSelectedItem(item);setOpen(true)}}>
-    <View style={[styles.listItem, styles.row]}>
-      {/* <Text style={[styles.cell, styles.srNo]}>{item.id}</Text> */}
-      <Text style={[styles.cell, styles.City]}>{item.city}</Text>
-      <Text style={[styles.cell, styles.Address]}>{item.Address}</Text>
-      <Text style={[styles.cell, styles.For]}>{item.for}</Text>
-      <Text style={[styles.cell, styles.Slot]}>{item.avilableSlot}</Text>
-    </View>
+    <TouchableOpacity
+      style={{}}
+      onPress={() => {
+        setSelectedItem(item);
+        setOpen(true);
+      }}
+    >
+      <View style={[styles.listItem, styles.row]}>
+        {/* <Text style={[styles.cell, styles.srNo]}>{item.id}</Text> */}
+        <Text style={[styles.cell, styles.City]}>{item.city}</Text>
+        <Text style={[styles.cell, styles.Address]}>{item.Address}</Text>
+        <Text style={[styles.cell, styles.For]}>{item.for}</Text>
+        <Text style={[styles.cell, styles.Slot]}>{item.avilableSlot}</Text>
+      </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} value={searchVal} setValue={setSearchVal}/>
+      <Header
+        navigation={navigation}
+        value={searchVal}
+        setValue={setSearchVal}
+      />
       <View style={styles.listContainer}>
+        <View style={styles.head}>
         <Text style={styles.headerText}>Available Parking</Text>
-        <View style={styles.row}>
+
+        <TouchableOpacity onPress={()=>navigation.navigate("addParking")}> 
+          <Text style={[styles.addParkingBTN,{backgroundColor:Theme.colors.primary}]}>Add Parking</Text>
+        </TouchableOpacity>
+        </View>
+        <View style={{height:"78%"}}>
+        <View style={[styles.row,{ borderColor:Theme.colors.primary,}]}>
           {/* <Text style={[[styles.cell, styles.srNo], styles.srNo]}>Sr</Text> */}
           <Text style={[styles.cell, styles.City]}>City</Text>
           <Text style={[styles.cell, styles.Address]}>Address</Text>
@@ -137,8 +155,19 @@ const List = ({navigation}) => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
+        </View>
+        {/* modal box  */}
+      <CardParkingDetails
+        data={selectItem}
+        isVisible={open}
+        onClose={() => {
+          setOpen(false);
+          setSelectedItem(null);
+        }}
+      />
       </View>
-      <CardParkingDetails data={selectItem} isVisible={open} onClose={()=>{setOpen(false);setSelectedItem(null)}}/>
+
+    
     </View>
   );
 };
@@ -149,17 +178,24 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     // flexDirection:"column"
     // maxWidth:"450px"
+  
+  },
+  head:{
+   flexDirection:"row",
+   paddingHorizontal:10
   },
   listContainer: {
-    flexGrow:1,
-    marginVertical:20,
-    // minHeight:"60%"
+    // flex: 1,
+    marginVertical: 20,
+    height:"250px",
+    overflow:"scroll",
   },
   headerText: {
-    textAlign: "center",
+    // textAlign: "center",
     fontSize: 20,
     fontWeight: "600",
     lineHeight: 30,
+    flex:1
   },
   listItem: {
     padding: 10,
@@ -169,7 +205,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderColor: "#000",
   },
   cell: {
     flex: 1,
@@ -191,22 +226,19 @@ const styles = StyleSheet.create({
   Slot: {
     maxWidth: "15%",
   },
-  btnWrapper:{
+  btnWrapper: {
     margin: "auto",
-    marginBottom:30,
-    width:"auto"
+    marginBottom: 30,
+    width: "auto",
   },
   addParkingBTN: {
-    fontSize:20,
-    backgroundColor: "green",
+    fontSize: 20,
     color: "white",
-    fontWeight:"800",
-    paddingHorizontal:15,
-    paddingVertical:10,
-    borderRadius:25,
-    
+    fontWeight: "800",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
 });
-
 
 export default List;

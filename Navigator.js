@@ -8,21 +8,10 @@ import List from "./src/screens/List";
 import AddParking from "./src/screens/AddParking";
 import Home from "./src/screens/Home";
 
-
-//theme
-import Theme from "./src/theme/Theme";
-
-
-
-
 // Stack Navigator
 const Stack = createStackNavigator();
 
-
-
 const Navigator = () => {
- const [searchVal,setSearchVal] =useState("");
- console.log(searchVal)
   return (
     <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" component={Home}
@@ -39,7 +28,7 @@ const Navigator = () => {
           }}
         component={List}
       />
-      <Stack.Screen name="Add Parking" component={AddParking} />
+      <Stack.Screen name="addParking" options={{title:"Add Parking Area"}} component={AddParking} />
     </Stack.Navigator>
   );
 };

@@ -15,21 +15,22 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pankaj2420.firstApp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.pankaj2420.firstApp"
+      "package": "parking.app_pankaj"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "af06f24f-b5a1-484e-8263-116b8bf8ac10"
+        "projectId": "90445acd-abb6-4245-8244-555cbc203d8a"
       }
     }
   }
