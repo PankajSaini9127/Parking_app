@@ -10,16 +10,18 @@ import { Marker } from "react-native-maps";
 const MapModalBox = ({
   isVisible,
   onClose,
-  selectedLocation,
-  setSelectedLocation,
+  formData,
+  setFormData,
 }) => {
   const Theme = useTheme();
 
 
   const handleMapPress = (event) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
-    setSelectedLocation({latitude,longitude});onClose();
+    setFormData({...formData,location:{latitude,longitude}});onClose();
   };
+
+  const location = formData.location?formData.location :null;
 
   return (
     <Modal
@@ -36,16 +38,16 @@ const MapModalBox = ({
           <MapView
             style={styles.map}
             initialRegion={{
-              latitude: selectedLocation? selectedLocation.latitude : 26.90226190048606,
-              longitude: selectedLocation? selectedLocation.longitude : 75.78641842294742,
+              latitude: location? location.latitude : 26.90226190048606,
+              longitude: location? location.longitude : 75.78641842294742,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
             onPress={handleMapPress}
           >
 
-            {selectedLocation  && (
-              <Marker coordinate={selectedLocation} title="Selected Location" />
+            {location  && (
+              <Marker coordinate={location} title="Selected Location" />
             )}
           </MapView>
           <View style={styles.btnContainer}>

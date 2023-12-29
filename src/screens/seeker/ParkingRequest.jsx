@@ -7,36 +7,49 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import textFieldStyle from "../../assets/styleSheets/textField";
-import MapModalBox from "../components/MapModalBox";
+
+import textFieldStyle from "../../../assets/styleSheets/textField";
+import MapModalBox from "../../components/MapModalBox"
+import CustomAlert from "../../components/utils/Alert";
+import { parkingRequest } from "../../services/parkingAPI";
+import { useDispatch, useSelector } from "react-redux";
+import setLoading from "../../store/action/loadingAction";
 
 
+function AddParkingRequest({route,navigation}) {
 
-function AddParking({ navigation }) {
+  let parking_id = route.params.id;
+
   const Theme = useTheme();
 
+  const auth = useSelector(s=>s.auth);
+
   const [formData, setFormData] = useState({
-    name: "",
-    address: "",
-    city: "",
-    area: "",
-    vehicleNo: "",
+    user_name: "",
+    user_email: "",
+    phone_no: "",
+    vehicle_no: "",
+    location:null,
+    parking_id
   });
+
+  const token = `Bearer ${auth.token}`;
+
+  const dispatch = useDispatch();
 
   const [error, setError] = useState(null);
 
   //state form map modal box
   const [openMap, setOpenMap] = useState(false);
 
-  const [selectedLocation, setSelectedLocation] = useState(null);
 
   function validate(data) {
     if (
-      data.name === "" ||
-      data.address === "" ||
-      data.city === "" ||
-      data.area === "" ||
-      vehicleNo === ""
+      data.user_name === "" ||
+      data.user_email === "" ||
+      data.phone_no === "" ||
+      data.vehicle_no === "" ||
+      data.location === null
     ) {
       setError("All Fields Are Required !");
       return false;
@@ -45,16 +58,45 @@ function AddParking({ navigation }) {
     }
   }
 
-  function handleSubmit() {
+async function handleSubmit() {
+  try {
     if (validate(formData)) {
-      console.log(formData);
+      dispatch(setLoading(true))
+      const result = await parkingRequest(token,formData)
+      dispatch(setLoading(false))
+        
+      if(result.status === 200){
+        CustomAlert(
+          (msg = result.message),
+          (success = false),
+          (title = "Parking Added.")
+        );
+        setTimeout(()=>{
+           navigation.goBack()
+        },1000)
+      }else{
+        CustomAlert(
+          (msg = result.message),
+          (success = false),
+          (title = "Something Went Wrong.")
+        );
+      }
+      
     }
+  } catch (error) {
+    console.log("Error While calling Add Parking Request function at Parking request",error);
+    CustomAlert(
+      (msg = result.message),
+      (success = false),
+      (title = "Something Went Wrong.")
+    );
+  }
   }
 
   return (
     <View style={styles.container}>
       <Text style={[styles.heading, { color: Theme.colors.primary }]}>
-        Add New Parking
+        Book Parking
       </Text>
       {error && <Text style={styles.error}>{error}</Text>}
 
@@ -67,11 +109,11 @@ function AddParking({ navigation }) {
         >
           <TextInput
             style={[textFieldStyle.inputText, { color: Theme.colors.primary }]}
-            placeholder="Name"
-            value={formData.name}
+            placeholder="Owner's Name"
+            value={formData.user_name}
             placeholderTextColor={Theme.colors.primary}
             onChangeText={(text) => {
-              setFormData({ ...formData, name: text });
+              setFormData({ ...formData, user_name: text });
               setError(null);
             }}
           />
@@ -85,15 +127,16 @@ function AddParking({ navigation }) {
         >
           <TextInput
             style={[textFieldStyle.inputText, { color: Theme.colors.primary }]}
-            placeholder="Address"
-            value={formData.address}
+            placeholder="Email"
+            value={formData.user_email}
             placeholderTextColor={Theme.colors.primary}
             onChangeText={(text) => {
-              setFormData({ ...formData, address: text });
+              setFormData({ ...formData, user_email: text });
               setError(null);
             }}
           />
         </View>
+
 
         <View
           style={[
@@ -103,30 +146,12 @@ function AddParking({ navigation }) {
         >
           <TextInput
             style={[textFieldStyle.inputText, { color: Theme.colors.primary }]}
-            placeholder="City"
-            value={formData.city}
-            placeholderTextColor={Theme.colors.primary}
-            onChangeText={(text) => {
-              setFormData({ ...formData, city: text });
-              setError(null);
-            }}
-          />
-        </View>
-
-        <View
-          style={[
-            textFieldStyle.inputView,
-            { borderColor: Theme.colors.primary },
-          ]}
-        >
-          <TextInput
-            style={[textFieldStyle.inputText, { color: Theme.colors.primary }]}
-            placeholder="Area"
-            value={formData.area}
+            placeholder="Phone No"
+            value={formData.phone_no}
             keyboardType="numeric"
             placeholderTextColor={Theme.colors.primary}
             onChangeText={(text) => {
-              setFormData({ ...formData, area: text });
+              setFormData({ ...formData, phone_no: text });
               setError(null);
             }}
           />
@@ -141,14 +166,16 @@ function AddParking({ navigation }) {
           <TextInput
             style={[textFieldStyle.inputText, { color: Theme.colors.primary }]}
             placeholder="Vehicle Number"
-            value={formData.area}
+            value={formData.vehicle_no}
+            autoCapitalize="characters"
             placeholderTextColor={Theme.colors.primary}
             onChangeText={(text) => {
-              setFormData({ ...formData, vehicleNo: text });
+              setFormData({ ...formData, vehicle_no: text });
               setError(null);
             }}
           />
         </View>
+
         <TouchableOpacity
           onPress={() => setOpenMap(true)}
         >
@@ -159,7 +186,7 @@ function AddParking({ navigation }) {
             styles.locationBtn
           ]}
         >
-          <Text style={[styles.locationText,{color:Theme.colors.primary}]}>{selectedLocation?"View / Change Location":"Select Location"}</Text>
+          <Text style={[styles.locationText,{color:Theme.colors.primary}]}>{formData.location?"View / Change Location":"Select Location"}</Text>
         </View>
         </TouchableOpacity>
 
@@ -170,19 +197,20 @@ function AddParking({ navigation }) {
         >
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
+        
       </View>
 
       <MapModalBox
         isVisible={openMap}
         onClose={() => setOpenMap(false)}
-        selectedLocation={selectedLocation}
-        setSelectedLocation={setSelectedLocation}
+        formData={formData}
+        setFormData={setFormData}
       />
     </View>
   );
 }
 
-export default AddParking;
+export default AddParkingRequest;
 
 const styles = StyleSheet.create({
   container: {

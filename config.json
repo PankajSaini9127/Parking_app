@@ -1,3 +1,4 @@
 {
-    "API_LIVE":"http://localhost:8080/"
+    "API_LIVE":"https://bca3-157-38-150-57.ngrok-free.app",
+    "API":"http://137.184.230.190"
 }

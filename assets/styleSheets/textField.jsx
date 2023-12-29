@@ -9,11 +9,12 @@ const textFieldStyle = StyleSheet.create({
         height: 50,
         // marginBottom: 20,
         justifyContent: "center",
-        padding: 20,
+        paddingHorizontal:20
       },
       inputText: {
         height: 50,
         fontSize: 20,
+        flex:1,
       },
 });
 

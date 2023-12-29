@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TextInput,TouchableOpacity } from "react-native
 
 import { useTheme } from "@react-navigation/native";
 
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { AntDesign } from '@expo/vector-icons'; 
 
 function Header({ value, setValue,navigation }) {

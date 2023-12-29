@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "firstApp",
-    "slug": "firstApp",
+    "name": "parking_app",
+    "slug": "parking_app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,7 +30,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "90445acd-abb6-4245-8244-555cbc203d8a"
+        "projectId": "77f65548-639e-4e39-81a2-3cdc4e4eb98c"
       }
     }
   }

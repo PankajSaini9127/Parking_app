@@ -1,59 +1,85 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  
+  Alert,
   Image,
 } from "react-native";
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from "@react-navigation/native";
 import textFieldStyle from "../../assets/styleSheets/textField";
+import { auth } from "../services/AuthAPI";
+import { useDispatch } from "react-redux";
+import { setLogin } from "../store/action/authAction";
+import setLoading from "../store/action/loadingAction";
+import CustomAlert from "../components/utils/Alert";
+//icons
+import { Ionicons } from "@expo/vector-icons";
 
 const LoginScreen = ({ navigation }) => {
-  const [data, setData] = useState({ user: "", password: "" });
+  const [data, setData] = useState({ email: "", password: "" });
 
-  const [formError,setFormError] = useState()
+  const [formError, setFormError] = useState();
 
   const Theme = useTheme();
 
+  const dispatch = useDispatch();
+  const [isVisiblePassword, setIsVisiblePassword] = useState(false)
+
+
   //validation
-  function validate(data){
-    if(data.user === "" && data.password === ""){
-      setFormError("Please Enter Creds!");
-    }else
-    if(data.user === ""){
-      setFormError("Please Enter UserId!");
-    }else if(data.password === ""){
-      setFormError("Please Enter Password!");
+  function validate(data) {
+    let error;
+    if (data.email === "" && data.password === "") {
+      error = "Please Enter Creds!";
+    } else if (data.email === "") {
+      error = "Please Enter UserId!";
+    } else if (data.password === "") {
+      error = "Please Enter Password!";
     }
 
-    if(formError === ""){
+    setFormError(error);
+
+    if (!error) {
       return true;
-    }else{
-    return false;
-  }
-  };
-
-  const handleLogin = () => {
-   //validation
-   if(validate(data)){
-    console.log("object")
-    if (data.user.trim().toLowerCase() === "test" && data.password === "Test") {
-      console.log("data matched");
-      setFormError("")
-      navigation.navigate("list");
     } else {
-      console.log("invalid")
-     setFormError("Invalid Creds!");
+      return false;
     }
-   }else{
-    console.log("validation error")
-   }
-   
-  };
+  }
+
+  async function handleLogin() {
+    try {
+      //validation
+      if (validate(data)) {
+        dispatch(setLoading(true));
+        const result = await auth(data);
+        dispatch(setLoading(false));
+        if (result.status === 203) {
+          CustomAlert(
+            (msg = result.message),
+            (success = false),
+            (title = "Something Went Wrong.")
+          );
+        } else if (result.status === 200) {
+          dispatch(setLogin(result));
+          navigation.navigate("list");
+        } else {
+          CustomAlert(
+            (msg = result.message),
+            (success = false),
+            (title = "Something Went Wrong.")
+          );
+        }
+      } else {
+        console.log("validation error login form");
+      }
+    } catch (error) {
+      console.log("Error While calling Login Function ", error);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -66,48 +92,73 @@ const LoginScreen = ({ navigation }) => {
 
       <View style={styles.contentContainer}>
         <Text style={styles.heading}>Sign In</Text>
-        {
-          formError &&   <Text style={styles.errorText}>{formError}</Text>
-        }
-    
-    <View style={{width:"100%",gap: 20 }}>
-        <View style={[textFieldStyle.inputView,{borderColor:Theme.colors.primary}]}>
-          <TextInput
-            style={[textFieldStyle.inputText,{color:Theme.colors.primary}]}
-            placeholder="User"
-            placeholderTextColor={Theme.colors.primary}
-            onChangeText={(text) =>{ setData({ ...data, user: text });setFormError("")}}
-          />
-          
-        </View>
+        {formError && <Text style={styles.errorText}>{formError}</Text>}
 
+        <View style={{ width: "100%", gap: 20 }}>
+          <View
+            style={[
+              textFieldStyle.inputView,
+              { borderColor: Theme.colors.primary},
+            ]}
+          >
+            <TextInput
+              style={[
+                textFieldStyle.inputText,
+                { color: Theme.colors.primary },
+              ]}
+              placeholder="User"
+              placeholderTextColor={Theme.colors.primary}
+              onChangeText={(text) => {
+                setData({ ...data, email: text });
+                setFormError("");
+              }}
+            />
+            
+          </View>
+
+          <View
+            style={[
+              textFieldStyle.inputView,
+              { borderColor: Theme.colors.primary },
+              styles.passwordField
+            ]}
+          >
+            <TextInput
+              secureTextEntry={!isVisiblePassword}
+              style={[
+                textFieldStyle.inputText,
+                { color: Theme.colors.primary },
       
+              ]}
+              placeholder="Password"
+              placeholderTextColor={Theme.colors.primary}
+              onChangeText={(text) => {
+                setData({ ...data, password: text });
+                setFormError("");
+              }}
+            />
+               <Ionicons onPress={()=>setIsVisiblePassword(!isVisiblePassword)} name={isVisiblePassword? "eye-off-outline":"eye-outline"} size={24} style={{alignSelf:"center"}} color={Theme.colors.primary} />
+          </View>
 
-        <View style={[textFieldStyle.inputView,{borderColor:Theme.colors.primary}]}>
-          <TextInput
-            secureTextEntry
-            style={[textFieldStyle.inputText,{color:Theme.colors.primary}]}
-            placeholder="Password"
-            placeholderTextColor={Theme.colors.primary}
-            onChangeText={(text) =>{ setData({ ...data, password: text });setFormError("")}}
-          />
-        </View>
-
-        <TouchableOpacity style={[styles.button,{backgroundColor:Theme.colors.primary}]} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Sign In</Text>
-        </TouchableOpacity>
-
-        <View style={styles.btnContainer}>
-          <Text style={styles.textRegister}>Don't Have An Account?</Text>
-
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-            <Text style={[styles.resgisterBtn,{color:Theme.colors.primary}]}>Register Now</Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: Theme.colors.primary }]}
+            onPress={handleLogin}
+          >
+            <Text style={styles.buttonText}>Sign In</Text>
           </TouchableOpacity>
-        </View>
 
-        </View>
+          <View style={styles.btnContainer}>
+            <Text style={styles.textRegister}>Don't Have An Account?</Text>
 
-        
+            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+              <Text
+                style={[styles.resgisterBtn, { color: Theme.colors.primary }]}
+              >
+                Register Now
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -121,7 +172,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    overflow:'hidden'
+    overflow: "hidden",
   },
   contentContainer: {
     flex: 1.5,
@@ -137,13 +188,16 @@ const styles = StyleSheet.create({
     lineHeight: 50,
     textAlign: "center",
   },
-  errorText:{
-    fontSize:16,
-    paddingVertical:5,
-    color:"red",
-    fontWeight:"700"
+  errorText: {
+    fontSize: 16,
+    paddingVertical: 5,
+    color: "red",
+    fontWeight: "700",
   },
- 
+  passwordField:{
+    flexDirection:"row",
+    justifyContent:"space-between"
+  },
   button: {
     width: "100%",
     borderRadius: 10,

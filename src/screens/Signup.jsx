@@ -6,16 +6,31 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Alert
 } from "react-native";
 
 import { useTheme } from "@react-navigation/native";
 import textFieldStyle from "../../assets/styleSheets/textField";
+import { register } from "../services/AuthAPI";
+import CustomAlert from "../components/utils/Alert";
+import { useDispatch } from "react-redux";
+import setLoading from "../store/action/loadingAction";
+
+//icons
+import { Ionicons } from '@expo/vector-icons'; 
 
 const SignUp = ({ navigation }) => {
   const [formError, setFormError] = useState("");
 
+  const [isVisible, setIsVisible] = useState({
+    password: false,
+    cPassword: false,
+  });
+
+  const dispatch = useDispatch();
+
   const [data, setData] = useState({
-    user: "",
+    name: "",
     password: "",
     cPassword: "",
     email: "",
@@ -24,10 +39,12 @@ const SignUp = ({ navigation }) => {
   //validation
   function validate(data) {
     let error;
-
+    if (data.name === "") {
+      error = "Please Enter Name!";
+    } else
     if (data.email === "") {
-      error = "Please Enter UserId!";
-    } else if (data.password === "") {
+      error = "Please Enter Email!";
+    }else if (data.password === "") {
       error = "Please Enter Password!";
     } else if (data.cPassword === "") {
       error = "Please Confirm Password!";
@@ -43,10 +60,26 @@ const SignUp = ({ navigation }) => {
     }
   }
 
-  const handleSignUp = () => {
-    if (validate(data)) {
-      navigation.navigate("Login");
+  async function handleSignUp(){
+    try{
+      if (validate(data)) {
+        dispatch(setLoading(true));
+        const result = await register(data);
+        dispatch(setLoading(false));
+        if(result.status === 203){
+          CustomAlert(msg=result.message, success=false, title="Register Failed.")
+        }else if( result.status === 200){
+          CustomAlert(msg="Login Now", success=true, title="Register Success.",navigateFun= ()=>navigation.navigate("Login"))
+        }else{
+          CustomAlert(msg=result.message, success=false, title="Register Failed.")
+        }
+        // navigation.navigate("Login");
+      }
+    } catch (error) {
+      console.log(error);
+      CustomAlert(msg=result.message, success=false, title="Something Went Wrong.");
     }
+   
   };
 
   const Theme = useTheme();
@@ -76,6 +109,25 @@ const SignUp = ({ navigation }) => {
                 { color: Theme.colors.primary },
               ]}
               s
+              placeholder="Name"
+              placeholderTextColor={Theme.colors.primary}
+              onChangeText={(text) => {
+                setData({ ...data, name: text });
+                setFormError("");
+              }}
+            />
+          </View>
+          <View
+            style={[
+              textFieldStyle.inputView,
+              { borderColor: Theme.colors.primary },
+            ]}
+          >
+            <TextInput
+              style={[
+                textFieldStyle.inputText,
+                { color: Theme.colors.primary },
+              ]}
               placeholder="Email"
               placeholderTextColor={Theme.colors.primary}
               onChangeText={(text) => {
@@ -89,15 +141,15 @@ const SignUp = ({ navigation }) => {
             style={[
               textFieldStyle.inputView,
               { borderColor: Theme.colors.primary },
+              styles.passwordField
             ]}
           >
             <TextInput
-              secureTextEntry
+              secureTextEntry={!isVisible.password}
               style={[
                 textFieldStyle.inputText,
                 { color: Theme.colors.primary },
               ]}
-              s
               value={data.password}
               placeholder="Password"
               placeholderTextColor={Theme.colors.primary}
@@ -106,20 +158,23 @@ const SignUp = ({ navigation }) => {
                 setFormError("");
               }}
             />
+              <Ionicons onPress={()=>setIsVisible({...isVisible,password:!isVisible.password})} name={isVisible.password? "eye-off-outline":"eye-outline"} size={24} style={{alignSelf:"center"}} color={Theme.colors.primary} />
           </View>
 
           <View
             style={[
               textFieldStyle.inputView,
               { borderColor: Theme.colors.primary },
+              styles.passwordField
             ]}
           >
             <TextInput
-              secureTextEntry
+              secureTextEntry={!isVisible.cPassword}
               value={data.cPassword}
               style={[
                 textFieldStyle.inputText,
                 { color: Theme.colors.primary },
+              
               ]}
               placeholder="Confirm Password"
               placeholderTextColor={Theme.colors.primary}
@@ -128,6 +183,7 @@ const SignUp = ({ navigation }) => {
                 setFormError("");
               }}
             />
+            <Ionicons onPress={()=>setIsVisible({...isVisible,cPassword:!isVisible.cPassword})} name={isVisible.cPassword? "eye-off-outline":"eye-outline"} size={24} style={{alignSelf:"center"}} color={Theme.colors.primary} />
           </View>
 
           <TouchableOpacity
@@ -165,7 +221,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   contentContainer: {
-    flex: 1.5,
+    flex: 2,
     padding: 25,
   },
 
@@ -185,6 +241,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     color: "red",
     fontWeight: "700",
+  },
+  passwordField:{
+    flexDirection:"row",
+    justifyContent:"space-between"
   },
   button: {
     width: "100%",
