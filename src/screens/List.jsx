@@ -171,7 +171,7 @@ const List = ({ navigation }) => {
 
         <View style={{gap:2,flex:1}}>
           <View style={{width:"80%"}}>
-          <TouchableOpacity onPress={() => navigation.navigate("parkingRequest")}>
+          <TouchableOpacity onPress={() =>{console.log("Button"); navigation.navigate("parkingRequest")}}>
               <Text
                 style={[
                   styles.addParkingBTN,

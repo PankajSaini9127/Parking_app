@@ -16,14 +16,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.pankaj2420.firstApp"
+      "bundleIdentifier": "com.pankaj2420.firstApp",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/anImageThatDoesNotExist.png" ,
         "backgroundColor": "#ffffff"
       },
-      "package": "parking.app_pankaj"
+      "package": "parking.app_pankaj",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +36,9 @@
       "eas": {
         "projectId": "77f65548-639e-4e39-81a2-3cdc4e4eb98c"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/77f65548-639e-4e39-81a2-3cdc4e4eb98c"
     }
   }
 }
